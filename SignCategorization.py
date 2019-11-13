@@ -94,6 +94,7 @@ model = Sequential([
     Conv2D(74, (3, 3), activation='relu'),
     Flatten(input_shape=(IMG_HEIGHT,IMG_WIDTH, 3)),
     Dense(74,activation='relu'),
+    Dropout(0.5),
     Dense(9,activation='softmax')
 ])
     
