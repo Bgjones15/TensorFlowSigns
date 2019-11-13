@@ -16,45 +16,37 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-PATH = 'Images'
+PATH = 'data'
 
-categories = ['Yes','No','Stop','Merge','fda','fe','dfe','sdfee']
+train_dir = os.path.join(PATH, 'training')
+validation_dir = os.path.join(PATH, 'validation')
+
+categories = ['AddedLane','KeepRight','LaneEnds','Merge','PedestrianCrossing','School','SignalAhead','Stop','Yield']
 
 training_dirs = []
 validation_dirs = []
-category_sizes_training = []
-category_sizes_validation = []
+testing_dirs = []
+
+total_train = 0;
+total_val = 0;
 
 for category in categories:
-    print(category)
-    training_dirs.append(os.path.join(train_dir, category))
-    validation_dirs.append(os.path.join(validation_dir, category))
-    category_sizes.append()
+    training_dirs.append(os.path.join(os.path.join(PATH,'training'), category))
+    validation_dirs.append(os.path.join(os.path.join(PATH,'validation'), category))
+    testing_dirs.append(os.path.join(os.path.join(PATH,'testing'), category))
+    
+    print('total amount of training ',category,': ',len(os.listdir(os.path.join(os.path.join(PATH,'training'), category))))
+    total_train += len(os.listdir(os.path.join(os.path.join(PATH,'training'), category)));
+    print('total amount of validation ',category,': ',len(os.listdir(os.path.join(os.path.join(PATH,'validation'), category))))
+    total_val += len(os.listdir(os.path.join(os.path.join(PATH,'validation'), category)));
+    print('total amount of testing ',category,': ',len(os.listdir(os.path.join(os.path.join(PATH,'testing'), category))))
     
 
 
-num_cats_tr = len(os.listdir(train_cats_dir))
-num_dogs_tr = len(os.listdir(train_dogs_dir))
-
-num_cats_val = len(os.listdir(validation_cats_dir))
-num_dogs_val = len(os.listdir(validation_dogs_dir))
-
-total_train = num_cats_tr + num_dogs_tr
-total_val = num_cats_val + num_dogs_val
-
-print('total training cat images:', num_cats_tr)
-print('total training dog images:', num_dogs_tr)
-
-print('total validation cat images:', num_cats_val)
-print('total validation dog images:', num_dogs_val)
-print("--")
-print("Total training images:", total_train)
-print("Total validation images:", total_val)
-
 batch_size = 128
-epochs = 15
-IMG_HEIGHT = 150
-IMG_WIDTH = 150
+epochs = 20
+IMG_HEIGHT = 37
+IMG_WIDTH = 37
 
 train_image_generator = ImageDataGenerator(rescale=1./255) # Generator for our training data
 validation_image_generator = ImageDataGenerator(rescale=1./255) # Generator for our validation data
@@ -62,13 +54,11 @@ validation_image_generator = ImageDataGenerator(rescale=1./255) # Generator for 
 train_data_gen = train_image_generator.flow_from_directory(batch_size=batch_size,
                                                            directory=train_dir,
                                                            shuffle=True,
-                                                           target_size=(IMG_HEIGHT, IMG_WIDTH),
-                                                           class_mode='binary')
+                                                           target_size=(IMG_HEIGHT, IMG_WIDTH))
 
 val_data_gen = validation_image_generator.flow_from_directory(batch_size=batch_size,
                                                               directory=validation_dir,
-                                                              target_size=(IMG_HEIGHT, IMG_WIDTH),
-                                                              class_mode='binary')
+                                                              target_size=(IMG_HEIGHT, IMG_WIDTH))
 
 sample_training_images, _ = next(train_data_gen)
 
@@ -85,19 +75,13 @@ def plotImages(images_arr):
 plotImages(sample_training_images[:5])
 
 model = Sequential([
-    Conv2D(16, 3, padding='same', activation='relu', input_shape=(IMG_HEIGHT, IMG_WIDTH ,3)),
-    MaxPooling2D(),
-    Conv2D(32, 3, padding='same', activation='relu'),
-    MaxPooling2D(),
-    Conv2D(64, 3, padding='same', activation='relu'),
-    MaxPooling2D(),
-    Flatten(),
-    Dense(512, activation='relu'),
-    Dense(1, activation='sigmoid')
+    Flatten(input_shape=(IMG_HEIGHT,IMG_WIDTH, 3)),
+    Dense(128,activation='relu'),
+    Dense(9,activation='softmax')
 ])
     
 model.compile(optimizer='adam',
-              loss='binary_crossentropy',
+              loss='categorical_crossentropy',
               metrics=['accuracy'])
 
 model.summary()
