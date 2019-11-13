@@ -12,6 +12,9 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
+from PIL import Image
+from skimage import transform
+
 from sklearn.metrics import classification_report, confusion_matrix
 
 import os
@@ -131,6 +134,13 @@ print(classification_report(test_data_gen.classes, y_pred, target_names=target_n
 
 
 print(score)
+
+np_image = Image.open('yield.jpg')
+np_image = np.array(np_image).astype('float32')/255
+np_image = transform.resize(np_image, (37,37,3))
+np_image = np.expand_dims(np_image, axis=0)
+
+print(model.predict(np_image))
 
 
 acc = history.history['acc']
