@@ -8,6 +8,8 @@
 import os
 import argparse
 import math
+import random
+import shutil
 from PIL import Image
 
 def count_occluded(csv_path):
@@ -73,8 +75,7 @@ def avg_dimension(csv_lines):
 
 
 dirname = os.path.dirname(__file__)
-print(dirname)
-
+'''
 # Exclude examples that are either not in the categories we want, occluded, or not on a main road
 desired_categories = ['addedLane', 'keepRight', 'laneEnds', 'merge', 'pedestrianCrossing', 'school', 'signalAhead', 'stop', 'yield']
 create_filtered_csv(desired_categories, True, True, os.path.join(dirname, 'allAnnotations.csv'), os.path.join(dirname, 'filteredAnnotations.csv'))
@@ -140,4 +141,51 @@ for line in csv_lines:
     prepped_csv.write(prepped_line)
 
 prepped_csv.close()
-img.close()
+img.close()'''
+
+training_dir = os.path.join(dirname, "training")
+validation_dir = os.path.join(dirname, "validation")
+testing_dir = os.path.join(dirname, "testing")
+if not os.path.exists(training_dir):
+    os.mkdir(training_dir)
+if not os.path.exists(validation_dir):
+    os.mkdir(validation_dir)
+if not os.path.exists(testing_dir):
+    os.mkdir(testing_dir)
+
+category_dirs = os.listdir(os.path.join(dirname, "prepped"))
+category_dirs = [d for d in category_dirs if os.path.isdir(os.path.join(dirname, "prepped", d))]
+for d in category_dirs:
+    examples = os.listdir(os.path.join(dirname, "prepped", d))
+    examples = [e for e in examples if e.endswith(".png")]
+
+    # Copy training (60% of total data)
+    indices = random.sample(range(len(examples)), math.ceil(0.60*len(examples)))
+    training = [examples[i] for i in indices]
+    for t in training:
+        source = os.path.join(dirname, "prepped", d, t)
+        if not os.path.exists(os.path.join(training_dir, d)):
+            os.mkdir(os.path.join(training_dir, d))
+        dest = os.path.join(training_dir, d, t)
+        shutil.copyfile(source, dest)
+        examples.remove(t)
+
+    # Copy validation (50% of the remaing 40% = 20% of total)
+    indices = random.sample(range(len(examples)), math.ceil(0.50*len(examples)))
+    validation = [examples[i] for i in indices]
+    for v in validation:
+        source = os.path.join(dirname, "prepped", d, v)
+        if not os.path.exists(os.path.join(validation_dir, d)):
+            os.mkdir(os.path.join(validation_dir, d))
+        dest = os.path.join(validation_dir, d, v)
+        shutil.copyfile(source, dest)
+        examples.remove(v)
+
+    # Copy testing (100% of the remaining 20% = 20% of total)
+    for t in examples:
+        source = os.path.join(dirname, "prepped", d, t)
+        if not os.path.exists(os.path.join(testing_dir, d)):
+            os.mkdir(os.path.join(testing_dir, d))
+        dest = os.path.join(testing_dir, d, t)
+        shutil.copyfile(source, dest)
+        examples.remove(t)
