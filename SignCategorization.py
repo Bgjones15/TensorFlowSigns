@@ -12,6 +12,8 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
+from sklearn.metrics import classification_report, confusion_matrix
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -70,13 +72,6 @@ test_data_gen = testing_image_generator.flow_from_directory(batch_size=batch_siz
                                                            shuffle=False,
                                                            target_size=(IMG_HEIGHT, IMG_WIDTH))
 
-pred_gen = testing_image_generator.flow_from_directory(
-        directory=test_dir,
-        target_size=(IMG_HEIGHT, IMG_WIDTH),
-        batch_size=batch_size,
-        class_mode=None,
-        shuffle=False)
-
 sample_training_images, _ = next(train_data_gen)
 
 # This function will plot images in the form of a grid with 1 row and 5 columns where images are placed in each column.
@@ -121,17 +116,16 @@ history = model.fit_generator(
 
 score = model.evaluate_generator(test_data_gen, total_test//batch_size)
 
-pred = model.predict_generator(pred_gen, total_test//batch_size)
+test_data_gen.reset()
 
-predicted_class_indicies=np.argmax(pred,axis=1)
-
-labels = pred_gen.class_indices
-#labels2 = dict((v,k) for k,v in labels.items())
-predictions = [labels[k] for k in predicted_class_indicies]
-
-print(predicted_class_indicies)
-print(labels)
-print(predictions)
+#Confution Matrix and Classification Report
+Y_pred = model.predict_generator(test_data_gen, total_test // batch_size+1)
+y_pred = np.argmax(Y_pred, axis=1)
+print('Confusion Matrix')
+print(confusion_matrix(test_data_gen.classes, y_pred))
+print('Classification Report')
+target_names = list(test_data_gen.class_indices.keys())
+print(classification_report(test_data_gen.classes, y_pred, target_names=target_names))
 
 
 
