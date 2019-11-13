@@ -15,11 +15,13 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 PATH = 'data'
 
 train_dir = os.path.join(PATH, 'training')
 validation_dir = os.path.join(PATH, 'validation')
+test_dir = os.path.join(PATH, 'testing');
 
 categories = ['AddedLane','KeepRight','LaneEnds','Merge','PedestrianCrossing','School','SignalAhead','Stop','Yield']
 
@@ -29,6 +31,7 @@ testing_dirs = []
 
 total_train = 0;
 total_val = 0;
+total_test = 0;
 
 for category in categories:
     training_dirs.append(os.path.join(os.path.join(PATH,'training'), category))
@@ -40,16 +43,18 @@ for category in categories:
     print('total amount of validation ',category,': ',len(os.listdir(os.path.join(os.path.join(PATH,'validation'), category))))
     total_val += len(os.listdir(os.path.join(os.path.join(PATH,'validation'), category)));
     print('total amount of testing ',category,': ',len(os.listdir(os.path.join(os.path.join(PATH,'testing'), category))))
+    total_test += len(os.listdir(os.path.join(os.path.join(PATH,'testing'), category)));
     
 
 
-batch_size = 128
+batch_size = 100
 epochs = 20
 IMG_HEIGHT = 37
 IMG_WIDTH = 37
 
 train_image_generator = ImageDataGenerator(rescale=1./255) # Generator for our training data
 validation_image_generator = ImageDataGenerator(rescale=1./255) # Generator for our validation data
+testing_image_generator = ImageDataGenerator(rescale=1./255)
 
 train_data_gen = train_image_generator.flow_from_directory(batch_size=batch_size,
                                                            directory=train_dir,
@@ -59,6 +64,18 @@ train_data_gen = train_image_generator.flow_from_directory(batch_size=batch_size
 val_data_gen = validation_image_generator.flow_from_directory(batch_size=batch_size,
                                                               directory=validation_dir,
                                                               target_size=(IMG_HEIGHT, IMG_WIDTH))
+
+test_data_gen = testing_image_generator.flow_from_directory(batch_size=batch_size,
+                                                           directory=test_dir,
+                                                           shuffle=False,
+                                                           target_size=(IMG_HEIGHT, IMG_WIDTH))
+
+pred_gen = testing_image_generator.flow_from_directory(
+        directory=test_dir,
+        target_size=(IMG_HEIGHT, IMG_WIDTH),
+        batch_size=batch_size,
+        class_mode=None,
+        shuffle=False)
 
 sample_training_images, _ = next(train_data_gen)
 
@@ -75,8 +92,13 @@ def plotImages(images_arr):
 plotImages(sample_training_images[:5])
 
 model = Sequential([
+    Conv2D(37, (3, 3), activation='relu', input_shape=(37, 37, 3)),
+    MaxPooling2D((2, 2)),
+    Conv2D(74, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    Conv2D(74, (3, 3), activation='relu'),
     Flatten(input_shape=(IMG_HEIGHT,IMG_WIDTH, 3)),
-    Dense(128,activation='relu'),
+    Dense(74,activation='relu'),
     Dense(9,activation='softmax')
 ])
     
@@ -86,35 +108,41 @@ model.compile(optimizer='adam',
 
 model.summary()
 
+callback = tf.keras.callbacks.EarlyStopping(monitor='val_acc', patience=3)
+
 history = model.fit_generator(
     train_data_gen,
     steps_per_epoch=total_train // batch_size,
     epochs=epochs,
+    callbacks=[callback],
     validation_data=val_data_gen,
     validation_steps=total_val // batch_size
 )
+
+score = model.evaluate_generator(test_data_gen, total_test//batch_size)
+
+pred = model.predict_generator(pred_gen, total_test//batch_size)
+
+predicted_class_indicies=np.argmax(pred,axis=1)
+
+labels = pred_gen.class_indices
+#labels2 = dict((v,k) for k,v in labels.items())
+predictions = [labels[k] for k in predicted_class_indicies]
+
+print(predicted_class_indicies)
+print(labels)
+print(predictions)
+
+
+
+print(score)
+
 
 acc = history.history['acc']
 val_acc = history.history['val_acc']
 
 loss = history.history['loss']
 val_loss = history.history['val_loss']
-
-epochs_range = range(epochs)
-
-plt.figure(figsize=(8, 8))
-plt.subplot(1, 2, 1)
-plt.plot(epochs_range, acc, label='Training Accuracy')
-plt.plot(epochs_range, val_acc, label='Validation Accuracy')
-plt.legend(loc='lower right')
-plt.title('Training and Validation Accuracy')
-
-plt.subplot(1, 2, 2)
-plt.plot(epochs_range, loss, label='Training Loss')
-plt.plot(epochs_range, val_loss, label='Validation Loss')
-plt.legend(loc='upper right')
-plt.title('Training and Validation Loss')
-plt.show()
 
 
 
