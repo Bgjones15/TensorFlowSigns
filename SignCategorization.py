@@ -8,6 +8,7 @@ Created on Wed Oct 30 16:43:38 2019
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import tensorflow as tf
+import tensorflowjs as tfjs
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -117,6 +118,8 @@ history = model.fit_generator(
     validation_data=val_data_gen,
     validation_steps=total_val // batch_size
 )
+
+tfjs.converters.save_keras_model(model,'model')
 
 score = model.evaluate_generator(test_data_gen, total_test//batch_size)
 
