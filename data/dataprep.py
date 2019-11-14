@@ -158,10 +158,12 @@ category_dirs = [d for d in category_dirs if os.path.isdir(os.path.join(dirname,
 for d in category_dirs:
     examples = os.listdir(os.path.join(dirname, "prepped", d))
     examples = [e for e in examples if e.endswith(".png")]
+    print(d + ' (total): ' + str(len(examples)))
 
     # Copy training (60% of total data)
     indices = random.sample(range(len(examples)), math.ceil(0.60*len(examples)))
     training = [examples[i] for i in indices]
+    print(d + ' (training): ' + str(len(training)))
     for t in training:
         source = os.path.join(dirname, "prepped", d, t)
         if not os.path.exists(os.path.join(training_dir, d)):
@@ -173,6 +175,7 @@ for d in category_dirs:
     # Copy validation (50% of the remaing 40% = 20% of total)
     indices = random.sample(range(len(examples)), math.ceil(0.50*len(examples)))
     validation = [examples[i] for i in indices]
+    print(d + ' (validation): ' + str(len(validation)))
     for v in validation:
         source = os.path.join(dirname, "prepped", d, v)
         if not os.path.exists(os.path.join(validation_dir, d)):
@@ -182,10 +185,18 @@ for d in category_dirs:
         examples.remove(v)
 
     # Copy testing (100% of the remaining 20% = 20% of total)
-    for t in examples:
+    testing = list(examples)
+    print(d + ' (testing): ' + str(len(testing)))
+    for t in testing:
         source = os.path.join(dirname, "prepped", d, t)
         if not os.path.exists(os.path.join(testing_dir, d)):
             os.mkdir(os.path.join(testing_dir, d))
         dest = os.path.join(testing_dir, d, t)
         shutil.copyfile(source, dest)
         examples.remove(t)
+
+print('## Total file counts')
+for c in os.listdir(training_dir):
+    print(c + ' (training): ' + str(len(os.listdir(os.path.join(training_dir, c)))))
+    print(c + ' (validation): ' + str(len(os.listdir(os.path.join(validation_dir, c)))))
+    print(c + ' (testing): ' + str(len(os.listdir(os.path.join(testing_dir, c)))))
