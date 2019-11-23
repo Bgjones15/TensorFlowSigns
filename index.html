@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<header>
+    <title>Traffic Sign Classifier</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.min.js"></script>
+    <script src="js/predict.js"></script>
+</header>
+
+<body>
+    <div id="root-container" class="flex-col-container">
+        <div id="examples">
+            <!-- On click of image predict it -->
+            <img src="img/yield.jpg" />
+            <img src="img/stop.jpg" />
+            <img src="http://placekitten.com/800/800" />
+            <img src="http://placekitten.com/800/800" />
+        </div>
+            
+        <div id="prep-area">
+            <div id="upload-box">
+                <input type="file" name="files[]" id="file-upload" accept="image/*" />
+                <label for="file-upload" class="file-upload-label"><strong>Choose a file</strong> or drag it here</label>
+            </div>
+        </div>
+
+        <div id="result-container">
+            
+        </div>
+
+        <!-- Upload card section -->
+    </div>
+</body>
+</html>
