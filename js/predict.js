@@ -16,13 +16,15 @@ async function loadModel() {
 
 async function handleFiles(files) {
     previewImage(files[0])
-    let predictionResult = await predictImage(files[0]) // should probably wait for them to press a button in prod
+    let predictionResult = await predictImage(files[0])
 }
 
 async function predictImage(file) {
     if(model == undefined) {
         await loadModel()
     }
+
+    document.getElementById("prep-area").style.display = 'none'
 
     let reader = new FileReader()
     reader.readAsDataURL(file)
@@ -66,26 +68,25 @@ function previewImage(file) {
     }
 }
 
-
 $(document).ready(function() {
-    // Handle drag and drop events
-    let dropArea = document.getElementById('upload-box')
+    //Preload model
+    loadModel()
+
+    // Handle drag and drop file upload
     $("#upload-box").on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
         //Prevent any default drag and drop events from happening
         e.preventDefault()
         e.stopPropagation()
     }).on('dragover dragenter', function (e) {
-        //highlight upload box
+        $("#upload-box").css("background-color", "lightgray")
     }).on('dragleave dragend drop', function(e) {
-        //unhighlight upload box
+        $("#upload-box").css("background-color", "#f9f9f9")
     }).on('drop', function(e) {
         handleFiles(e.originalEvent.dataTransfer.files)
     });
 
+    // Handle manual file upload
     $("#file-upload").on('change', function (e) {
         handleFiles(this.files)
     });
-
-    //Preload model
-    loadModel()
 });

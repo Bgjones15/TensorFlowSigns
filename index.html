@@ -12,14 +12,20 @@
 
 <body>
     <div id="root-container" class="flex-col-container">
-        <div id="examples">
-            <!-- On click of image predict it -->
-            <img src="img/yield.jpg" />
-            <img src="img/stop.jpg" />
-            <img src="http://placekitten.com/800/800" />
-            <img src="http://placekitten.com/800/800" />
-        </div>
+        <header class="page-header">
+            <div class="traffic-light">
+                <div class="light red-light"></div>
+                <div class="light yellow-light"></div>
+                <div class="light green-light"></div>
+            </div>
             
+            <div class="page-header-text">
+                <h1>Traffic Sign Classification</h1>
+                <h3>Using TensorFlow, our neural network algorithm can tell you the type of sign in an image.</h3>
+                <h3>Try it out by uploading an image below!</h3>
+            </div>
+        </header>
+
         <div id="prep-area">
             <div id="upload-box">
                 <input type="file" name="files[]" id="file-upload" accept="image/*" />
@@ -27,11 +33,15 @@
             </div>
         </div>
 
-        <div id="result-container">
-            
+        <div class="flex-row-center">
+            <div id="result-container">
+                <img src="img/stop.jpg">
+                <ul>
+                    <li>Result 1: 10%</li>
+                    <li>Result 2: 20%</li>
+                </ul>
+            </div>
         </div>
-
-        <!-- Upload card section -->
     </div>
 </body>
 </html>
