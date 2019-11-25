@@ -1,7 +1,5 @@
-@font-face {
-    font-family: 'Varela Round';
-    src: url('https://fonts.googleapis.com/css?family=Varela+Round')
-}
+@import url('https://fonts.googleapis.com/css?family=Varela+Round&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
 
 html, body {
     width: 100%;
@@ -31,9 +29,16 @@ body {
 }
 
 .page-header-text {
-    font-family: 'Varela Round', sans-serif;
     max-width: 500px;
     align-self: center;
+}
+
+.page-header-text > h1 {
+    font-family: 'Roboto', sans-serif;
+}
+
+.page-header-text > h3 {
+    font-family: 'Varela Round', sans-serif;
 }
 
 .traffic-light {
