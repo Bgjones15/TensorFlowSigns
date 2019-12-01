@@ -3,7 +3,8 @@
 <header>
     <title>Traffic Sign Classifier</title>
     <link rel="stylesheet" type="text/css" href="css/style.css" />
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.min.css" />
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.6/cropper.min.js"></script>
@@ -11,37 +12,30 @@
 </header>
 
 <body>
-    <div id="root-container" class="flex-col-container">
-        <header class="page-header">
-            <div class="traffic-light">
-                <div class="light red-light"></div>
-                <div class="light yellow-light"></div>
-                <div class="light green-light"></div>
-            </div>
-            
-            <div class="page-header-text">
-                <h1>Traffic Sign Classification</h1>
-                <h3>Using TensorFlow, our neural network algorithm can tell you the type of sign in an image.</h3>
-                <h3>Try it out by uploading an image below!</h3>
-            </div>
-        </header>
-
-        <div id="prep-area">
-            <div id="upload-box">
-                <input type="file" name="files[]" id="file-upload" accept="image/*" />
-                <label for="file-upload" class="file-upload-label"><strong>Choose a file</strong> or drag it here</label>
-            </div>
+    <header class="page-header">
+        <div class="traffic-light">
+            <div class="light red-light"></div>
+            <div class="light yellow-light"></div>
+            <div class="light green-light"></div>
         </div>
 
-        <div class="flex-row-center">
-            <div id="result-container">
-                <img src="img/stop.jpg">
-                <ul>
-                    <li>Result 1: 10%</li>
-                    <li>Result 2: 20%</li>
-                </ul>
-            </div>
+        <div class="page-header-text">
+            <h1>Traffic Sign Classification</h1>
+            <h3>Using TensorFlow, our neural network algorithm can tell you the type of sign in an image.</h3>
+            <h3>Try it out by uploading an image below!</h3>
+        </div>
+    </header>
+
+    <div id="prep-area">
+        <div id="upload-box">
+            <div class="loading loading-upload"></div>
+            <input type="file" name="files[]" id="file-upload" accept="image/*" />
+            <label for="file-upload" class="file-upload-label"><strong>Choose a file</strong> or drag it here</label>
         </div>
     </div>
+
+    <div class="results">
+    </div>
 </body>
+
 </html>

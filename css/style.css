@@ -75,14 +75,21 @@ body {
     background-color: #1DB793;
 }
 
-/*
-.flex-col-container {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    justify-content: center;
+.loading {
+    display: none;
+    border: 3px solid hsla(185, 100%, 62%, 0.2);
+    border-top-color: #3cefff;
+    border-radius: 50%;
+    width: 3em;
+    height: 3em;
+    animation: spin 1s linear infinite;
 }
-*/
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 #prep-area {
     margin-bottom: 25px;
@@ -91,18 +98,6 @@ body {
     flex-direction: row;
     justify-content: center;
 }
-/*
-#upload-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 50%;
-    max-width: 500px;
-    height: 200px;
-    outline: 2px dashed #000;
-}
-*/
 
 #upload-box {
     display: grid;
@@ -116,17 +111,84 @@ body {
     align-content: space-evenly;
 }
 
+#file-upload {
+    display: none;
+}
+
 .file-upload-label {
     text-align: center;
     cursor: pointer;
 }
 
-#file-upload {
-    display: none;
+.results {
+    width: 90%;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
-#result-container {
+.result {
+    border: 3px solid black;
+    border-radius: 5%;
+    margin: 5px;
+    flex: 1 0 24%;
+    min-width: 200px;
+    max-width: 350px;
+}
+
+.result picture {
     display: flex;
-    flex-direction: column;
-    max-width: 200px;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.result img {
+    height: 100px;
+    width: auto;
+    border: 2px black solid;
+}
+
+.predictions {
+    margin-bottom: 10px;
+    border-top: 3px solid black;
+    display: block;
+}
+
+.prediction {
+    margin-left: 5%;
+    margin-right: 5%;
+    height: 2rem;
+    width: 90%;
+}
+
+.prediction:first-child {
+    border-radius: 10px;
+    background-color: #33cc33;
+    margin-top: 5px;
+    padding-left: 2.5%;
+    padding-right: 2.5%;
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+}
+
+.prediction p {
+    padding: 0;
+    margin: 0;
+    height: 2rem;
+    line-height: 2rem;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.prediction-class {
+    float: left;
+    padding-left: 10px;
+}
+
+.prediction-percent {
+    float: right;
+    padding-right: 10px;
 }

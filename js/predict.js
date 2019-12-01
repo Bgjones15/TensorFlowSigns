@@ -8,6 +8,7 @@ async function loadModel() {
     model = undefined;
     try {
         model = await tf.loadLayersModel(modelURL)
+        model.summary()
     } catch(err) {
         console.log('Failed to load model')
         console.log(err)
@@ -24,24 +25,21 @@ async function predictImage(file) {
         await loadModel()
     }
 
-    document.getElementById("prep-area").style.display = 'none'
-
     let reader = new FileReader()
     reader.readAsDataURL(file)
     reader.onloadend = async function () {
         let img = document.createElement('img')
         img.src = reader.result
+
+        // Conversion to grayscale would be mean(2) and then expandDims(2)
+        // won't work currently because conv2d input layer expects rgb [1, 37, 37, 3]
         let tensor = tf.browser.fromPixels(img)
             .resizeNearestNeighbor([37, 37])
             .toFloat()
             .div(tf.scalar(255))
             .expandDims(0)
-        tensor.print()
 
-        let predictions = await model.predict(tensor)
-        console.log(predictions.values)
-        predictions.print()
-        predictions = predictions.data()
+        let predictions = await model.predict(tensor).data()
         let results = Array.from(predictions)
             .map(function (p, i) {
                 return {
@@ -51,8 +49,31 @@ async function predictImage(file) {
             }).sort(function (a, b) {
                 return b.probability - a.probability;
             }).slice(0, 9);
-        console.log(results)
+        
+        createResultCard(results, img)
     }
+}
+
+function createResultCard(results, img) {
+    let resultDiv = $("<div>", { "class": "result" })
+    resultDiv.append($('<picture/>').append(img))
+
+    let predictionsDiv = $("<div>", { "class": "predictions" })
+    results.forEach(result => {
+        let predDiv = $("<div>", { "class": "prediction" })
+        let predClass = $("<p>", { "class": "prediction-class" })
+        let predResult = $("<p>", { "class": "prediction-percent"})
+
+        predClass.html(result.className)
+        predResult.html(result.probability.toFixed(2) + '%')
+
+        predDiv.append(predClass)
+        predDiv.append(predResult)
+        predictionsDiv.append(predDiv)
+    });
+
+    resultDiv.append(predictionsDiv)
+    $('.results').append(resultDiv) 
 }
 
 function previewImage(file) {
@@ -64,7 +85,7 @@ function previewImage(file) {
         img.src = reader.result
         img.style.height = '200px'
         img.style.width = '200px'
-        document.getElementById('result-container').appendChild(img)
+        //document.getElementById('result-container').appendChild(img)
     }
 }
 
