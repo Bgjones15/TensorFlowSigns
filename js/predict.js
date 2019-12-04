@@ -16,7 +16,8 @@ async function loadModel() {
 }
 
 async function handleFiles(files) {
-    await predictImage(files[0])
+    previewImage(files[0])
+    let predictionResult = await predictImage(files[0])
 }
 
 async function predictImage(file) {
@@ -27,9 +28,6 @@ async function predictImage(file) {
     let reader = new FileReader()
     reader.readAsDataURL(file)
     reader.onloadend = async function () {
-        $('.loading').css('display', 'block')
-        $('.file-upload-label').css('display', 'none')
-
         let img = document.createElement('img')
         img.src = reader.result
 
@@ -45,7 +43,7 @@ async function predictImage(file) {
         let results = Array.from(predictions)
             .map(function (p, i) {
                 return {
-                    probability: p,
+                    probability: p * 100,
                     className: categories[i]
                 };
             }).sort(function (a, b) {
@@ -53,9 +51,6 @@ async function predictImage(file) {
             }).slice(0, 9);
         
         createResultCard(results, img)
-
-        $('.loading').css('display', 'none')
-        $('.file-upload-label').css('display', 'block')
     }
 }
 
@@ -79,6 +74,19 @@ function createResultCard(results, img) {
 
     resultDiv.append(predictionsDiv)
     $('.results').append(resultDiv) 
+}
+
+function previewImage(file) {
+    let reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onloadend = function () {
+        let img = document.createElement('img')
+        img.id = 'uploaded-img'
+        img.src = reader.result
+        img.style.height = '200px'
+        img.style.width = '200px'
+        //document.getElementById('result-container').appendChild(img)
+    }
 }
 
 $(document).ready(function() {
