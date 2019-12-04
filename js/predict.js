@@ -16,8 +16,7 @@ async function loadModel() {
 }
 
 async function handleFiles(files) {
-    previewImage(files[0])
-    let predictionResult = await predictImage(files[0])
+    await predictImage(files[0])
 }
 
 async function predictImage(file) {
@@ -28,14 +27,17 @@ async function predictImage(file) {
     let reader = new FileReader()
     reader.readAsDataURL(file)
     reader.onloadend = async function () {
+        $('.loading').css('display', 'block')
+        $('.file-upload-label').css('display', 'none')
+
         let img = document.createElement('img')
         img.src = reader.result
-        img.style.width = '37'
-        img.style.height = '37'
+        img.width = '37'
+        img.height = '37'
 
         // Conversion to grayscale would be mean(2) and then expandDims(2)
         // won't work currently because conv2d input layer expects rgb [1, 37, 37, 3]
-        let tensor = tf.browser.fromPixels(img, 4)
+        let tensor = tf.browser.fromPixels(img, 3)
             .resizeNearestNeighbor([37, 37])
             .toFloat()
             .div(tf.scalar(255))
@@ -53,6 +55,9 @@ async function predictImage(file) {
             }).slice(0, 9);
         
         createResultCard(results, img)
+
+        $('.loading').css('display', 'none')
+        $('.file-upload-label').css('display', 'block')
     }
 }
 
@@ -76,19 +81,6 @@ function createResultCard(results, img) {
 
     resultDiv.append(predictionsDiv)
     $('.results').append(resultDiv) 
-}
-
-function previewImage(file) {
-    let reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onloadend = function () {
-        let img = document.createElement('img')
-        img.id = 'uploaded-img'
-        img.src = reader.result
-        img.style.height = '200px'
-        img.style.width = '200px'
-        //document.getElementById('result-container').appendChild(img)
-    }
 }
 
 $(document).ready(function() {
