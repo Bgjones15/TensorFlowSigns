@@ -45,7 +45,7 @@ async function predictImage(file) {
         let results = Array.from(predictions)
             .map(function (p, i) {
                 return {
-                    probability: p * 100,
+                    probability: p,
                     className: categories[i]
                 };
             }).sort(function (a, b) {
