@@ -32,12 +32,10 @@ async function predictImage(file) {
 
         let img = document.createElement('img')
         img.src = reader.result
-        img.width = '37'
-        img.height = '37'
 
         // Conversion to grayscale would be mean(2) and then expandDims(2)
         // won't work currently because conv2d input layer expects rgb [1, 37, 37, 3]
-        let tensor = tf.browser.fromPixels(img, 3)
+        let tensor = tf.browser.fromPixels(img)
             .resizeNearestNeighbor([37, 37])
             .toFloat()
             .div(tf.scalar(255))
